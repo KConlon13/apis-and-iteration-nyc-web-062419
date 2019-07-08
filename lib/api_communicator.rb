@@ -60,6 +60,7 @@ end
 def show_character_movies(character)
   character = character.split(" ").collect {|word| word.capitalize}.join(" ")
   films = get_character_movies_from_api(character)
+ 
   if films.class == String
     "That character does not exist, Trekkie."
   else
@@ -71,7 +72,7 @@ def get_opening_crawl(movie)
   response_string = RestClient.get('http://www.swapi.co/api/films/')
   response_hash = JSON.parse(response_string)
 
-  film = response_hash["results"].find {|film| film["title"] == movie}
+  film = response_hash["results"].find {|film| film["title"].downcase == movie}
  crawl_array = film["opening_crawl"].split("\r\n")
  crawl_array.each do |line| 
   puts line
@@ -79,11 +80,11 @@ def get_opening_crawl(movie)
  end
 end
 
-# puts get_character_movies_from_api("H")
+# puts get_character_movies_from_api("Luke Skywalker")
 # puts show_character_movies("luke skywalker")
 ## BONUS
 
-puts get_opening_crawl("A New Hope")
+# puts get_opening_crawl("A New Hope")
 
 # that `get_character_movies_from_api` method is probably pretty long. Does it do more than one job?
 # can you split it up into helper methods?
