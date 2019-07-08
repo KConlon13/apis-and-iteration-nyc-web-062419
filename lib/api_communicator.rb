@@ -13,7 +13,7 @@ def get_character_movies_from_api(character_name)
   all_characters << response_hash["results"]
 
   loop do
-    binding.pry
+    
     if response_hash["next"] == nil
       break
     else
@@ -26,8 +26,12 @@ def get_character_movies_from_api(character_name)
 
   all_characters = all_characters.flatten
 
-  character_hash = all_characters.first {|character| character["name"] == character_name}
+  character_hash = all_characters.find {|character| character["name"] == character_name}
 
+  
+  if character_hash == nil
+    return "That character does not exist, Trekkie."
+  end
   
   # iterate over the response hash to find the collection of `films` for the given
   #   `character`
@@ -44,20 +48,42 @@ def get_character_movies_from_api(character_name)
   # this collection will be the argument given to `print_movies`
   #  and that method will do some nice presentation stuff like puts out a list
   #  of movies by title. Have a play around with the puts with other info about a given film.
+  
   character_films
 end
 
 def print_movies(films)
   # some iteration magic and puts out the movies in a nice list
+  films.collect {|film| film["title"]}
 end
 
 def show_character_movies(character)
+  character = character.split(" ").collect {|word| word.capitalize}.join(" ")
   films = get_character_movies_from_api(character)
-  print_movies(films)
+  if films.class == String
+    "That character does not exist, Trekkie."
+  else
+    print_movies(films)
+  end
 end
 
-get_character_movies_from_api("P")
+def get_opening_crawl(movie)
+  response_string = RestClient.get('http://www.swapi.co/api/films/')
+  response_hash = JSON.parse(response_string)
+
+  film = response_hash["results"].find {|film| film["title"] == movie}
+ crawl_array = film["opening_crawl"].split("\r\n")
+ crawl_array.each do |line| 
+  puts line
+  sleep 1
+ end
+end
+
+# puts get_character_movies_from_api("H")
+# puts show_character_movies("luke skywalker")
 ## BONUS
+
+puts get_opening_crawl("A New Hope")
 
 # that `get_character_movies_from_api` method is probably pretty long. Does it do more than one job?
 # can you split it up into helper methods?
